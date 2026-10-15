@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/Models/">
+    <File Path="RaceDayAPI/Organiser.cs" />
+    <File Path="RaceDayAPI/Participant.cs" />
+  </Folder>
   <Project Path="RaceDayAPI/RaceDayAPI.csproj" />
 </Solution>
