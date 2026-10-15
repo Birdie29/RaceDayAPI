@@ -2,7 +2,12 @@
 using RaceDayAPI.Models;
 namespace RaceDayAPI.Data
 {
-    public class RaceDayContext
+    public class RaceDayContext : DbContext
     {
+        public RaceDayContext(DbContextOptions<RaceDayContext> options) : base(options)
+        {
+        }
+        public DbSet<Participant> Participants { get; set; }
+        public DbSet<Organiser> Organisers { get; set; }
     }
 }
