@@ -1,4 +1,4 @@
-﻿namespace RaceDayAPI
+﻿namespace RaceDayAPI.Modelss
 {
     public class raceEvent
     { public int eventID {get; set;}
