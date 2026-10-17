@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;    
-using RaceDayAPI.Models;
 using RaceDayAPI.Modelss;
 namespace RaceDayAPI.Data
 {

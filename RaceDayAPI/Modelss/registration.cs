@@ -1,4 +1,5 @@
-﻿namespace RaceDayAPI.Modelss
+﻿
+namespace RaceDayAPI.Modelss
 {
     public class registration
     {
