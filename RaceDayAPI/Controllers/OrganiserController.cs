@@ -4,6 +4,7 @@ using RaceDayAPI.Modelss;
 
 namespace RaceDayAPI.Controllers
 {
+    [Authorise(Roles = "Organiser")]
     [ApiController]
     [Route("api/[Controller]")]
     public class OrganiserController : ControllerBase
