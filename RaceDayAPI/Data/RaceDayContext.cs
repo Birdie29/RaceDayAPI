@@ -9,5 +9,6 @@ namespace RaceDayAPI.Data
         }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<Organiser> Organisers { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
