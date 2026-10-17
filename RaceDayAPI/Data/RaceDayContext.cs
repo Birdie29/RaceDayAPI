@@ -12,5 +12,6 @@ namespace RaceDayAPI.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<raceEvent> RaceEvents { get; set; }
         public DbSet<registration> Registrations { get; set; }
+        public DbSet<result> Results { get; set; }
     }
 }
