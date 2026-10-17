@@ -1,107 +1,92 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameowkCore;
+using Microsoft.EntityFrameworkCore;
+using RaceDayAPI.Data;
 using RaceDayAPI.Modelss;
 
-namespace RaceDay.Controllers
+namespace RaceDayAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class registration : ControllerBase
+    public class RegistrationController : ControllerBase
     {
-        private readonly
-        RaceDayContext _context;
+        private readonly RaceDayContext _context;
 
-        public
-        registration(RaceDayContext context)
+        public RegistrationController(RaceDayContext context)
         {
             _context = context;
         }
 
-        [HttpPost("Participant")]
-        public async
-        Task<IActionResult>
-        registerParticipant(Participant participant)
+        [HttpGet]
+        public async Task<IActionResult> GetRegistrations()
         {
-            var email = participant.Email.Trim().ToLowerInvariant();
-
-            bool emailExists = await
-            _context.Participant
-            .AnyAsync(p =>
-            p.Email == email)
-             || await
-             _context.Organiser.AnyAsync(
-                o => o.Email == email
-             );
-
-             if(emailExists)
-             {
-                return Conflict(new
-                {
-                    message = "This email is already registered."
-                });
-             }
-                participant.Email = email;
-                participant.Password = BCrypt.Net.BCrypt.HashPassword(participant.Password);
-
-                _context.Participants.Add(participant);
-                await
-                _context.SaveChangesAsync();
-
-                return
-                Created("/api/registration/Participant", new
-                {
-                    message = "Participant registered successfully.",
-                    participantID = participant.ParticipantID,
-                    name = participant.ParticipantName,
-                    email =participant.ParticipantEmail
-                });
-
-                [HttpPost("Organiser")]
-                public async
-                Task<IActionResult>RegisterOrganiser(
-                    Organiser organiser)
-               {
-                    var email =
-                    organiser.Email.Trim().ToLowerInvariant();
-
-                    bool emailExists = await
-                    _context.Organiser.AnyAsync(
-                        o => o.Email ==
-                        email
-                    )
-                    || await
-                    _context.Participant.AnyAsync(
-                        p => p.Email == email
-                    );
-
-                    if(emailExists
-                    {
-                        return Conflict(new
-                        {
-                            message = "This email is already registered."
-                        });
-                    }
-                    organiser.Email = email;
-                    organiser.Password = BCrypt.Net.BCrypt.HashPassword(
-                        organiser.Password
-                    );
-
-                    _context.Organiser.Add(organiser);
-                    await
-                    _context.SaveChangesAsync();
-
-                    return 
-                    Created("/api/registration/Organiser", new
-                    {
-                        message = "Organiser registered successfully.",
-                        organiserID = organiser.OrganiserID,
-                        name = organiser.OrganiserName,
-                        email = organiser.OrganiserEmail
-                    });
-                    
-               } 
+            var registrations = await _context.Registrations.ToListAsync();
+            return Ok(registrations);
         }
 
-     
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetRegistration(int id)
+        {
+            var registration = await _context.Registrations.FindAsync(id);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(registration);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateRegistration(registration newRegistration)
+        {
+            _context.Registrations.Add(newRegistration);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(GetRegistration),
+                new { id = newRegistration.registrationID },
+                newRegistration);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRegistration(int id, registration updatedRegistration)
+        {
+            if (id != updatedRegistration.registrationID)
+            {
+                return BadRequest("Registration ID does not match.");
+            }
+
+            var registration = await _context.Registrations.FindAsync(id);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            registration.registrationDate = updatedRegistration.registrationDate;
+            registration.registrationChannel = updatedRegistration.registrationChannel;
+            registration.participantID = updatedRegistration.participantID;
+            registration.eventID = updatedRegistration.eventID;
+            registration.categoryID = updatedRegistration.categoryID;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteRegistration(int id)
+        {
+            var registration = await _context.Registrations.FindAsync(id);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            _context.Registrations.Remove(registration);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
