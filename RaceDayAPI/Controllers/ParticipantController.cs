@@ -4,6 +4,7 @@ using RaceDayAPI.Modelss;
 
 namspace RaceDayAPI.Controllers
 {
+    [Authorize(Roles = "Participant")]
     [ApiController]
     [Route("api/[controller]")]
     public class
