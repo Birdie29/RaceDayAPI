@@ -1,113 +1,88 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RaceDayAPI.Data
+using RaceDayAPI.Data;
 using RaceDayAPI.Modelss;
 
 namespace RaceDayAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class raceEventController : ControllerBase
+    public class RaceEventController : ControllerBase
     {
-        private readonly
-        RaceDayContext _context;
+        private readonly RaceDayContext _context;
 
-        public 
-        raceEventController(RaceDayContext 
-        context)
+        public RaceEventController(RaceDayContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        public async
-        Take<IActionResult> GetEvents()
+        public async Task<IActionResult> GetEvents()
         {
-            var event = await
-            _context.raceEvent.ToListAsync();
-            return Ok(event);
+            var events = await _context.RaceEvents.ToListAsync();
+            return Ok(events);
         }
 
         [HttpGet("{id}")]
-        public async
-        Take<IActionResult> GetEvent(int id)
+        public async Task<IActionResult> GetEvent(int id)
         {
-            var eventItem = await
-            _context.raceEvent.FindAsync(id);
+            var raceEvent = await _context.RaceEvents.FindAsync(id);
 
-            if (eventItem == null)
+            if (raceEvent == null)
             {
                 return NotFound("Event not found.");
             }
-             return Ok(eventItem);
+
+            return Ok(raceEvent);
         }
 
         [HttpPost]
-        public async
-        Task<IActionResult> CreateEvent(
-            [FromBody] raceEvent
-            newEvent
-        )
+        public async Task<IActionResult> CreateEvent([FromBody] raceEvent newEvent)
         {
-            if (!ModelState.IsValid)
-            {
-                returnBadRequest(ModelState);
-            }
+            _context.RaceEvents.Add(newEvent);
+            await _context.SaveChangesAsync();
 
-            _context.raceEvent.Add(newEvent);
-            await
-            _context.SaveChangesAsync();
-
-            return CreateAtAction(
+            return CreatedAtAction(
                 nameof(GetEvent),
-                new {id = newEvent.ID},
-                newEvent
-            );
-
+                new { id = newEvent.eventID },
+                newEvent);
         }
+
         [HttpPut("{id}")]
-        public asyncTask<IActionResult> UpdateEvent(
-            int id,
-            [FromBody] raceEvent updatedEvent
-        )
+        public async Task<IActionResult> UpdateEvent(int id, [FromBody] raceEvent updatedEvent)
         {
-            if (id! = updatedEvent.Id)
+            if (id != updatedEvent.eventID)
             {
-                returnBadRequest("Event.ID does not match.");
+                return BadRequest("Event ID does not match.");
             }
 
-            var existingEvent = await
-            _context.raceEvent.FindAsync(id);
+            var existingEvent = await _context.RaceEvents.FindAsync(id);
 
-            if(existingEvent == null)
+            if (existingEvent == null)
             {
                 return NotFound("Event not found.");
             }
 
-            _context.Entry(existingEvent)
-            .CurrentValues.SetValues(updatedEvent);
-            await
-            _context.SaveChangesAsync();
+            _context.Entry(existingEvent).CurrentValues.SetValues(updatedEvent);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async
-        Task<IActionResult> DeleteEvent(int id)
+        public async Task<IActionResult> DeleteEvent(int id)
         {
-            var eventItem = await
-            _context.raceEvent.FindAsync(id);
+            var raceEvent = await _context.RaceEvents.FindAsync(id);
 
-            if(eventItem == null)
+            if (raceEvent == null)
             {
-                return NotFound("Event not found");
+                return NotFound("Event not found.");
             }
 
-            _context.raceEvent.Remove(eventItem);
-            await
-            _context.SaveChangesAsync();
+            _context.RaceEvents.Remove(raceEvent);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
-
     }
 }
