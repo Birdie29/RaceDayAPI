@@ -19,6 +19,34 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IPasswordHasher<Participant>,
 PasswordHasher<Participant>>();
 
+builder.Services.AddControllers();
+builder.Services.AddAuthentication(
+    CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.SlidingExpiration = true;
+
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = 403;
+
+            return Task.CompletedTask;
+        });
+
+    }
+)
+ builder.Services.AddAuthorization();
+ 
 var app = builder.Build();
 builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlServer (
     builder.Configuration.GetConnectionString("DefaultConnection")));
