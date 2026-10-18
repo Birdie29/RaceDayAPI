@@ -12,34 +12,36 @@ namespace RaceDayAPI.UnitTesting
         {
             var createEvent = new createEvent
             {
-                eventID = 1001,
-                eventName = "Marathon",
+                eventID = 301,
+                eventName = "Soweto Marathon",
                 eventDate = DateTime.Now.AddDays(30),
                 location = "Johannesburg",
                 distance = 42.195,
-                organiserId = 1
+                organiserId = 101
             };
 
-            var eventName = createEvent.eventName;
-            Assert.Equal("Marathon", eventName);
+            var result = await _controller.Create(createEvent);
+            Assert.IsType<CreatedActionResult>(result);
+            Assert.Equal("Soweto Marathon", result.eventName);
         }
 
         [Fact]
-        public void OrganiserViewsEvent()
+        public void InvalidEventCreation()
         {
             var eventView = new eventView
             {
-                eventID = 1002,
-                eventName = "Marathon",
+                eventID = 301,
+                eventName = "Swimming Competition",
                 eventDate = DateTime.Now.AddDays(30),
-                location = "City Park",
+                location = " ",
                 distance = 42.195,
-                organiserId = 2
+                organiserId = 101
             };
           
-            var eventName = eventView.eventName;
+          _controller.ModelState.AddModelError("location", "Location is required.");
+            var result = await_controller.Create(eventView);
 
-            Assert.Equal("Marathon", eventName);
+            Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
@@ -47,17 +49,37 @@ namespace RaceDayAPI.UnitTesting
         {
             var eventUpdate = new eventUpdate
             {
-                eventID = 1003,
-                eventName = "Marathon",
+                eventID = 302,
+                eventName = "Two Oceans",
                 eventDate = DateTime.Now.AddDays(30),
-                location = "City Park",
+                location = "Cape Town",
                 distance = 5.0, 
-                organiserId = 3
+                organiserId = 101
             };
            
-            eventUpdate.distance = 10.0;
+            var result = await _controller.Update(eventUpdate.eventID, eventUpdate);
 
-            Assert.Equal(10.0, eventUpdate.distance);
+            Assert.IsType<OkObjectResult>(result);
+        }
+
+        [Fact]
+        public void InvalidEventUpdate()
+        {
+            var eventUpdate = new eventUpdate
+            {
+                eventID = 302,
+                eventName = " ",
+                eventDate = DateTime.Now.AddDays(30),           
+        location = "Cape Town",
+                distance = 5.0, 
+                organiserId = 101
+            };
+          
+            _controller.ModelState.AddModelError("eventName", "Event name is required.");
+            var result = await _controller.Update(eventUpdate.eventID, eventUpdate);
+
+            
+            Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
@@ -65,17 +87,34 @@ namespace RaceDayAPI.UnitTesting
         {
             var eventDelete = new eventDelete
             {
-                eventID = 1004,
+                eventID = 301,
                 eventName = "Marathon",
                 eventDate = DateTime.Now.AddDays(30),
                 location = "City Park",
                 distance = 42.195,
-                organiserId = 4
+                organiserId = 1003
             };
           
-            eventDelete.RemoveAll(e => e.eventID == 1004);
+            eventDelete.RemoveAll(e => e.eventID == 301);
 
             Assert.Empty(eventDelete);
         }
-    }
+
+        [Fact]
+        public void InvalidEventDeletion()
+        {
+            var eventDelete = new eventDelete
+            {
+                eventID = 302,
+                eventName = " ",
+                eventDate = DateTime.Now.AddDays(30),
+                location = "City Park",
+                distance = 42.195,
+                organiserId = 1003
+            };
+            _controller.ModelState.AddModelError("eventName", "Event name is required.");
+            var result = await _controller.Delete(eventDelete.eventID);
+            
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
 }
