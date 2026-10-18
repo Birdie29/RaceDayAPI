@@ -15,5 +15,15 @@ namespace RaceDayAPI.Data
         public DbSet<RaceEvent> RaceEvents { get; set; }
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<Result> Results { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Participant>().HasKey(participant => participant.participantID);
+            modelBuilder.Entity<Organiser>().HasKey(organiser => organiser.organiserID);
+            modelBuilder.Entity<Category>().HasKey(category => category.categoryID);
+            modelBuilder.Entity<RaceEvent>().HasKey(raceEvent => raceEvent.eventID);
+            modelBuilder.Entity<Registration>().HasKey(registration => registration.registrationID);
+            modelBuilder.Entity<Result>().HasKey(result => result.resultID);
+        }
     }
 }

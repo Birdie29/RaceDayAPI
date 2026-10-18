@@ -63,6 +63,9 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Local SQLite database
+RaceDayAPI/raceDay.db
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
