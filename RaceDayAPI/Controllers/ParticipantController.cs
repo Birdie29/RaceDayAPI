@@ -19,6 +19,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> GetParticipants()
         {
             var participants = await _context.Participants
@@ -35,7 +36,8 @@ namespace RaceDayAPI.Controllers
             return Ok(participants);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> GetParticipant(int id)
         {
             var participant = await _context.Participants
@@ -57,6 +59,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> CreateParticipant(Participant participant)
         {
             _context.Participants.Add(participant);
@@ -72,7 +75,8 @@ namespace RaceDayAPI.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> UpdateParticipant(int id, Participant updatedParticipant)
         {
             var participant = await _context.Participants
