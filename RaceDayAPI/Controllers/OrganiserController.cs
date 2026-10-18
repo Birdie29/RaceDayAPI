@@ -19,6 +19,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> GetOrganisers()
         {
             var organisers = await _context.Organisers
@@ -35,7 +36,8 @@ namespace RaceDayAPI.Controllers
             return Ok(organisers);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> GetOrganiser(int id)
         {
             var organiser = await _context.Organisers
@@ -57,6 +59,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> CreateOrganiser(Organiser organiser)
         {
             _context.Organisers.Add(organiser);
@@ -72,7 +75,8 @@ namespace RaceDayAPI.Controllers
             });
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> UpdateOrganiser(int id, Organiser updatedOrganiser)
         {
             var organiser = await _context.Organisers
@@ -101,7 +105,8 @@ namespace RaceDayAPI.Controllers
             });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> DeleteOrganiser(int id)
         {
             var organiser = await _context.Organisers
