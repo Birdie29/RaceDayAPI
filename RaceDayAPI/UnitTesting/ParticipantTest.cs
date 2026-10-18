@@ -1,5 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using RaceDayAPI.Modelss;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RaceDayAPI.UnitTesting;
