@@ -17,13 +17,15 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> GetRegistrations()
         {
             var registrations = await _context.Registrations.ToListAsync();
             return Ok(registrations);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "Participant, Organiser")]
         public async Task<IActionResult> GetRegistration(int id)
         {
             var registration = await _context.Registrations.FindAsync(id);

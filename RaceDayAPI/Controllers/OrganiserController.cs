@@ -37,7 +37,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "Participant")]
+        [Authorize(Roles = "Participant, Organiser")]
         public async Task<IActionResult> GetOrganiser(int id)
         {
             var organiser = await _context.Organisers
