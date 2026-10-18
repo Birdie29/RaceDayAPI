@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDayAPI.Data;
@@ -24,9 +25,9 @@ namespace RaceDayAPI.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id}")]
         [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> GetCategory(int id)
+        public async Task<IActionResult> GetCategory(string id)
         {
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.categoryID == id);
@@ -49,9 +50,9 @@ namespace RaceDayAPI.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = category.categoryID }, category);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> UpdateCategory(int id, Category updatedCategory)
+        public async Task<IActionResult> UpdateCategory(string id, Category updatedCategory)
         {
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.categoryID == id);
@@ -72,7 +73,7 @@ namespace RaceDayAPI.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory(string id)
         {
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.categoryID == id);
