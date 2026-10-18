@@ -27,7 +27,7 @@ namespace RaceDayAPI.UnitTesting
             Assert.IsType<OkObjectResult>(result);
         }
         [Fact]
-        public void InvalidParticipantRegistration()
+        public void InvalidRegistrationData()
         {
             var registration = new Registration
             {
@@ -46,5 +46,38 @@ namespace RaceDayAPI.UnitTesting
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
+        [Fact]
+        public void UnauthenticatedUser()
+        {
+            var registration = new Registration
+            {
+                registrationID = 5,
+                registrationDate = DateTime.Now,
+                registrationChannel = "Email",
+                registrationStatus = "Alive",
+                participantID = 2,
+                eventID = 3,
+                categoryID = 4
+            };
+
+            var result = await _controller.CreateRegistration(registration);
+            Assert.IsType<UnauthorizedResult>(result);
     }
+
+    [Fact]
+    public void UnauthorizedUser()
+    {
+        var registration = new Registration
+        {
+            registrationID = 6,
+            registrationDate = DateTime.Now,
+            registrationChannel = "Phone",
+            registrationStatus = "Pending",
+            participantID = 7,
+            eventID = 8,
+            categoryID = 9
+        };
+
+        var result = await _controller.CreateRegistration(registration);
+        Assert.IsType<ForbidResult>(result);
 }
