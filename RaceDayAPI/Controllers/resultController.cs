@@ -17,13 +17,15 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Participant")]
         public async Task<IActionResult> GetResults()
         {
             var results = await _context.Results.ToListAsync();
             return Ok(results);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> GetResultById(int id)
         {
             var result = await _context.Results.FindAsync(id);
@@ -37,6 +39,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> CreateResult(Result newResult)
         {
             _context.Results.Add(newResult);
@@ -48,7 +51,8 @@ namespace RaceDayAPI.Controllers
                 newResult);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> UpdateResult(int id, Result updatedResult)
         {
             if (id != updatedResult.resultID)
@@ -71,7 +75,8 @@ namespace RaceDayAPI.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> DeleteResult(int id)
         {
             var result = await _context.Results.FindAsync(id);
