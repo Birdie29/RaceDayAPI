@@ -46,6 +46,25 @@ public class ParticipantTest
     }
 
     [Fact]
+    public void ParticipantWithMissingSurname_FailsRequiredValidation()
+    {
+        var participant = new Participant
+        {       
+            participantName = "John",
+            participantSurname = null,
+            email = "   "
+            phoneNumber = "123-456-7890",
+            passwordHash = "hashed-password"
+        };
+
+        var validationResults = Validate(participant);
+
+        Assert.Contains(validationResults, result =>
+            result.MemberNames.Contains(nameof(Participant.participantSurname)));
+    }
+
+
+    [Fact]
     public void ParticipantWithInvalidEmail_FailsEmailValidation()
     {
         var participant = new Participant
@@ -63,15 +82,5 @@ public class ParticipantTest
             result.MemberNames.Contains(nameof(Participant.email)));
     }
 
-    private static List<ValidationResult> Validate(Participant participant)
-    {
-        var validationResults = new List<ValidationResult>();
-        Validator.TryValidateObject(
-            participant,
-            new ValidationContext(participant),
-            validationResults,
-            validateAllProperties: true);
-
-        return validationResults;
-    }
+   
 }
