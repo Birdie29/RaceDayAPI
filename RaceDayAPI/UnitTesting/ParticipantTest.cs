@@ -32,7 +32,7 @@ public class ParticipantTest
     {
         var participant = new Participant
         {
-            participantName = string.Empty,
+            participantName = null,
             participantSurname = "Doe",
             email = "john.doe@example.com",
             phoneNumber = "123-456-7890",
@@ -52,7 +52,7 @@ public class ParticipantTest
         {
             participantName = "John",
             participantSurname = "Doe",
-            email = "not-an-email",
+            email = "applesandoranges.com", // Invalid email format
             phoneNumber = "123-456-7890",
             passwordHash = "hashed-password"
         };
