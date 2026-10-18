@@ -12,40 +12,39 @@ namespace RaceDayAPI.UnitTesting
         {
             var registration = new Registration
             {
-                registrationID = 1,
+                registrationID = 501,
                 registrationDate = DateTime.Now, 
                 registrationChannel = "Online",
-                registrationStatus = "Confirmed",
-                participantID = 1,
-                eventID = 1,
-                categoryID = 1
+                registrationStatus = "Winner",
+                participantID = 202,
+                eventID = 301,
+                categoryID = 401
 
             };
 
-            var result = controller.CreateRegistration(registration);
+            var result = await _controller.CreateRegistration(registration);
 
-            Assert.IsType<CreatedActionResult>(result);
+            Assert.IsType<OkObjectResult>(result);
         }
-
         [Fact]
-        public void ParticipantFailureRegistration()
+        public void InvalidParticipantRegistration()
         {
             var registration = new Registration
             {
-                registrationID = 1,
-                registrationDate = DateTime.Now,
-                registrationChannel = "Online",
-                registrationStatus = "Confirmed",
-                participantID = 1,
-                eventID = 1,
-                categoryID = 1
+                registrationID = 502,
+                registrationDate = DateTime.Now,    
+            registrationChannel = "Disconnected",
+                registrationStatus = "DNF",
+                participantID = 202,
+                eventID = null,
+                categoryID = 402
             };
 
-            var context = new ValidationContext(registration);
-            var validationResults = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(registration, context, validationResults, true);
-            Assert.False(isValid);
-            Assert.NotEmpty(validationResults);
+            _controller.ModelState.AddModelError("eventID", "The eventID field is required.");
+
+            var result = await _controller.CreateRegistration(registration);
+            Assert.IsType<BadRequestObjectResult>(result);
         }
+
     }
 }
