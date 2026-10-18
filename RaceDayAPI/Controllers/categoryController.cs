@@ -17,6 +17,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Organiser, Participant")]
         public async Task<IActionResult> GetCategories()
         {
             var categories = await _context.Categories.ToListAsync();
@@ -38,6 +39,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Organiser")]
         public async Task<IActionResult> CreateCategory(Category category)
         {
             _context.Categories.Add(category);
@@ -46,8 +48,9 @@ namespace RaceDayAPI.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = category.categoryID }, category);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(string id, Category updatedCategory)
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Organiser")]
+        public async Task<IActionResult> UpdateCategory(int id, Category updatedCategory)
         {
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.categoryID == id);
@@ -67,7 +70,8 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(string id)
+        [Authorize(Roles = "Organiser")]
+        public async Task<IActionResult> DeleteCategory(int id)
         {
             var category = await _context.Categories
                 .FirstOrDefaultAsync(c => c.categoryID == id);
