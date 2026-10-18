@@ -37,7 +37,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateRegistration(registration newRegistration)
+        public async Task<IActionResult> CreateRegistration(Registration newRegistration)
         {
             _context.Registrations.Add(newRegistration);
             await _context.SaveChangesAsync();
@@ -49,7 +49,7 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRegistration(int id, registration updatedRegistration)
+        public async Task<IActionResult> UpdateRegistration(int id, Registration updatedRegistration)
         {
             if (id != updatedRegistration.registrationID)
             {

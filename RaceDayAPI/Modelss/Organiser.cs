@@ -1,8 +1,10 @@
-﻿namespace RaceDayAPI.Modelss
+using System.ComponentModel.DataAnnotations;
+
+namespace RaceDayAPI.Modelss
 {
     public class Organiser
     {
-        public int organiserID {get; set; }
+        public int organiserID { get; set; }
         [Required]
         public string organiserName { get; set; } = string.Empty;
         [Required]

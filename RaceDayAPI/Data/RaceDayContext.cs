@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;    
 using RaceDayAPI.Modelss;
+
 namespace RaceDayAPI.Data
 {
     public class RaceDayContext : DbContext
@@ -7,11 +8,12 @@ namespace RaceDayAPI.Data
         public RaceDayContext(DbContextOptions<RaceDayContext> options) : base(options)
         {
         }
+
         public DbSet<Participant> Participants { get; set; }
         public DbSet<Organiser> Organisers { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<raceEvent> RaceEvents { get; set; }
-        public DbSet<registration> Registrations { get; set; }
-        public DbSet<result> Results { get; set; }
+        public DbSet<RaceEvent> RaceEvents { get; set; }
+        public DbSet<Registration> Registrations { get; set; }
+        public DbSet<Result> Results { get; set; }
     }
 }

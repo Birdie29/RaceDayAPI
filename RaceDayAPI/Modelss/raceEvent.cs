@@ -1,13 +1,14 @@
-﻿namespace RaceDayAPI.Modelss
+namespace RaceDayAPI.Modelss
 {
-    public class raceEvent
-    { public int eventID {get; set;}
-        public string eventName {get; set; }
-        public string eventDescription {get; set;}
+    public class RaceEvent
+    {
+        public int eventID { get; set; }
+        public string eventName { get; set; } = string.Empty;
+        public string eventDescription { get; set; } = string.Empty;
         public DateTime eventDate { get; set; }
-        public string eventLocation { get; set; }
+        public string eventLocation { get; set; } = string.Empty;
         public decimal eventDistance { get; set; }
-        public string eventType { get; set; }
+        public string eventType { get; set; } = string.Empty;
         public int organiserID { get; set; }
     }
 }
