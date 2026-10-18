@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
@@ -19,7 +21,6 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IPasswordHasher<Participant>,
 PasswordHasher<Participant>>();
 
-builder.Services.AddControllers();
 builder.Services.AddAuthentication(
     CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -41,16 +42,19 @@ builder.Services.AddAuthentication(
             context.Response.StatusCode = 403;
 
             return Task.CompletedTask;
-        });
+        };
+    });
 
-    }
-)
- builder.Services.AddAuthorization();
- 
-var app = builder.Build();
-builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlServer (
+builder.Services.AddAuthorization();
+builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
