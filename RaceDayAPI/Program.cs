@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlServer(
+builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlite(
     builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
