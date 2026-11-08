@@ -35,6 +35,7 @@ namespace RaceDayAPI.UnitTesting
                 participantSurname = "Doe",
                 email = "       
                 passwordHash = "hashed-password"
+                phoneNumber = "123-456-7890"
             };
 
             var context = new ValidationContext(participant);
