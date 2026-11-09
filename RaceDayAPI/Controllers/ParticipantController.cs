@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDayAPI.Data;
@@ -12,10 +13,46 @@ namespace RaceDayAPI.Controllers
     public class ParticipantController : ControllerBase
     {
         private readonly RaceDayContext _context;
+        private readonly IPasswordHasher<Participant> _passwordHasher;
 
-        public ParticipantController(RaceDayContext context)
+        public ParticipantController(
+            RaceDayContext context,
+            IPasswordHasher<Participant> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterParticipant(RegisterParticipantRequest request)
+        {
+            var email = request.email.Trim();
+            if (await _context.Participants.AnyAsync(participant => participant.email == email))
+            {
+                return Conflict(new { message = "A participant with this email already exists." });
+            }
+
+            var participant = new Participant
+            {
+                participantName = request.participantName,
+                participantSurname = request.participantSurname,
+                email = email,
+                phoneNumber = request.phoneNumber
+            };
+            participant.passwordHash = _passwordHasher.HashPassword(participant, request.password);
+
+            _context.Participants.Add(participant);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetParticipant), new { id = participant.participantID }, new
+            {
+                participant.participantID,
+                participant.participantName,
+                participant.participantSurname,
+                participant.email,
+                participant.phoneNumber
+            });
         }
 
         [HttpGet]
@@ -71,8 +108,7 @@ namespace RaceDayAPI.Controllers
                 participant.participantName,
                 participant.participantSurname,
                 participant.email,
-                participant.phoneNumber,
-                participant.passwordHash
+                participant.phoneNumber
             });
         }
 

@@ -18,6 +18,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IPasswordHasher<Participant>,
 PasswordHasher<Participant>>();
+builder.Services.AddScoped<IPasswordHasher<Organiser>,
+PasswordHasher<Organiser>>();
 
 builder.Services.AddAuthentication(
     CookieAuthenticationDefaults.AuthenticationScheme)

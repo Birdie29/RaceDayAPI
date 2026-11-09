@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDayAPI.Data;
@@ -12,10 +13,46 @@ namespace RaceDayAPI.Controllers
     public class OrganiserController : ControllerBase
     {
         private readonly RaceDayContext _context;
+        private readonly IPasswordHasher<Organiser> _passwordHasher;
 
-        public OrganiserController(RaceDayContext context)
+        public OrganiserController(
+            RaceDayContext context,
+            IPasswordHasher<Organiser> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterOrganiser(RegisterOrganiserRequest request)
+        {
+            var email = request.email.Trim();
+            if (await _context.Organisers.AnyAsync(organiser => organiser.email == email))
+            {
+                return Conflict(new { message = "An organiser with this email already exists." });
+            }
+
+            var organiser = new Organiser
+            {
+                organiserName = request.organiserName,
+                organiserSurname = request.organiserSurname,
+                email = email,
+                phoneNumber = request.phoneNumber
+            };
+            organiser.passwordHash = _passwordHasher.HashPassword(organiser, request.password);
+
+            _context.Organisers.Add(organiser);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetOrganiser), new { id = organiser.organiserID }, new
+            {
+                organiser.organiserID,
+                organiser.organiserName,
+                organiser.organiserSurname,
+                organiser.email,
+                organiser.phoneNumber
+            });
         }
 
         [HttpGet]
@@ -71,8 +108,7 @@ namespace RaceDayAPI.Controllers
                 organiser.organiserName,
                 organiser.organiserSurname,
                 organiser.email,
-                organiser.phoneNumber,
-                organiser.passwordHash
+                organiser.phoneNumber
             });
         }
 
