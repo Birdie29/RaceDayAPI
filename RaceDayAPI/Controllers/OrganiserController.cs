@@ -71,7 +71,8 @@ namespace RaceDayAPI.Controllers
                 organiser.organiserName,
                 organiser.organiserSurname,
                 organiser.email,
-                organiser.phoneNumber
+                organiser.phoneNumber,
+                organiser.passwordHash
             });
         }
 

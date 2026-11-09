@@ -71,7 +71,8 @@ namespace RaceDayAPI.Controllers
                 participant.participantName,
                 participant.participantSurname,
                 participant.email,
-                participant.phoneNumber
+                participant.phoneNumber,
+                participant.passwordHash
             });
         }
 
