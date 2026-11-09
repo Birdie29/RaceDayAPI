@@ -58,40 +58,41 @@ namespace RaceDayAPI.Controllers
             });
         }
 
-        [AllowAnonymous]
-        [HttpPost("~/api/auth/login/organiser")]
+      [HttpPost("login")]
+      [AllowAnonymous]
         public async Task<IActionResult> LoginOrganiser(LoginRequest request)
         {
-            var email = request.email.Trim();
-            var organiser = await _context.Organisers
-                .FirstOrDefaultAsync(organiser => organiser.email == email);
+           var organiser = await _context.Organisers
+                .FirstOrDefaultAsync(o => o.email == request.email);
 
-            if (organiser == null ||
-                _passwordHasher.VerifyHashedPassword(organiser, organiser.passwordHash, request.password)
-                    == PasswordVerificationResult.Failed)
+            if (organiser == null)
             {
                 return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            var claims = new[]
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(organiser, organiser.passwordHash, request.password);
+            if (passwordVerificationResult != PasswordVerificationResult.Success)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, organiser.organiserID.ToString()),
-                new Claim(ClaimTypes.Name, organiser.email),
+                new Claim(ClaimTypes.Name, organiser.organiserName),
                 new Claim(ClaimTypes.Role, "Organiser")
             };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity));
 
-            return Ok(new
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
-                organiser.organiserID,
-                organiser.organiserName,
-                organiser.organiserSurname,
-                organiser.email,
-                organiser.phoneNumber
-            });
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            return Ok(new { message = "Login successful." });
         }
 
         [HttpGet]

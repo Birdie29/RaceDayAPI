@@ -58,8 +58,8 @@ namespace RaceDayAPI.Controllers
             });
         }
 
+        [HttpPost("login")]
         [AllowAnonymous]
-        [HttpPost("~/api/auth/login/participant")]
         public async Task<IActionResult> LoginParticipant(LoginRequest request)
         {
             var email = request.email.Trim();
@@ -73,19 +73,9 @@ namespace RaceDayAPI.Controllers
                 return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, participant.participantID.ToString()),
-                new Claim(ClaimTypes.Name, participant.email),
-                new Claim(ClaimTypes.Role, "Participant")
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity));
-
             return Ok(new
             {
+                message = "Participant Login successful.",
                 participant.participantID,
                 participant.participantName,
                 participant.participantSurname,
