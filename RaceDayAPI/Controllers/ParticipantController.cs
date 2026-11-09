@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using RaceDayAPI.Data;
 using RaceDayAPI.Modelss;
 
@@ -46,6 +49,42 @@ namespace RaceDayAPI.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetParticipant), new { id = participant.participantID }, new
+            {
+                participant.participantID,
+                participant.participantName,
+                participant.participantSurname,
+                participant.email,
+                participant.phoneNumber
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("~/api/auth/login/participant")]
+        public async Task<IActionResult> LoginParticipant(LoginRequest request)
+        {
+            var email = request.email.Trim();
+            var participant = await _context.Participants
+                .FirstOrDefaultAsync(participant => participant.email == email);
+
+            if (participant == null ||
+                _passwordHasher.VerifyHashedPassword(participant, participant.passwordHash, request.password)
+                    == PasswordVerificationResult.Failed)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, participant.participantID.ToString()),
+                new Claim(ClaimTypes.Name, participant.email),
+                new Claim(ClaimTypes.Role, "Participant")
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity));
+
+            return Ok(new
             {
                 participant.participantID,
                 participant.participantName,

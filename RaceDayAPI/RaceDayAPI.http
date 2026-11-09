@@ -4,3 +4,21 @@ GET {{RaceDayAPI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{RaceDayAPI_HostAddress}}/api/auth/login/participant
+Content-Type: application/json
+
+{
+  "email": "participant@example.com",
+  "password": "your-password"
+}
+
+###
+
+POST {{RaceDayAPI_HostAddress}}/api/auth/login/organiser
+Content-Type: application/json
+
+{
+  "email": "organiser@example.com",
+  "password": "your-password"
+}

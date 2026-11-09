@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using RaceDayAPI.Data;
 using RaceDayAPI.Modelss;
 
@@ -46,6 +49,42 @@ namespace RaceDayAPI.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetOrganiser), new { id = organiser.organiserID }, new
+            {
+                organiser.organiserID,
+                organiser.organiserName,
+                organiser.organiserSurname,
+                organiser.email,
+                organiser.phoneNumber
+            });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("~/api/auth/login/organiser")]
+        public async Task<IActionResult> LoginOrganiser(LoginRequest request)
+        {
+            var email = request.email.Trim();
+            var organiser = await _context.Organisers
+                .FirstOrDefaultAsync(organiser => organiser.email == email);
+
+            if (organiser == null ||
+                _passwordHasher.VerifyHashedPassword(organiser, organiser.passwordHash, request.password)
+                    == PasswordVerificationResult.Failed)
+            {
+                return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, organiser.organiserID.ToString()),
+                new Claim(ClaimTypes.Name, organiser.email),
+                new Claim(ClaimTypes.Role, "Organiser")
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity));
+
+            return Ok(new
             {
                 organiser.organiserID,
                 organiser.organiserName,
