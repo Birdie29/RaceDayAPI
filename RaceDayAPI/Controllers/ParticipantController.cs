@@ -41,7 +41,8 @@ namespace RaceDayAPI.Controllers
                 participantName = request.participantName,
                 participantSurname = request.participantSurname,
                 email = email,
-                phoneNumber = request.phoneNumber
+                phoneNumber = request.phoneNumber,
+                passwordHash = request.password
             };
             participant.passwordHash = _passwordHasher.HashPassword(participant, request.password);
 
@@ -54,7 +55,8 @@ namespace RaceDayAPI.Controllers
                 participant.participantName,
                 participant.participantSurname,
                 participant.email,
-                participant.phoneNumber
+                participant.phoneNumber,
+                participant.passwordHash
             });
         }
 
