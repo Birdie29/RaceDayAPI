@@ -101,7 +101,15 @@ namespace RaceDayAPI.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-            return Ok(new { message = "Login successful." });
+            return Ok(new
+            {
+                message = "Login successful.",
+                organiser.organiserID,
+                organiser.organiserName,
+                organiser.organiserSurname,
+                organiser.email,
+                organiser.phoneNumber
+            });
         }
 
         [HttpGet]

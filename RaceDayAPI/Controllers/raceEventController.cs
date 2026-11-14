@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using RaceDayAPI.Data;
 using RaceDayAPI.Modelss;
 
@@ -18,10 +19,25 @@ namespace RaceDayAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Participant")]
+        [Authorize(Roles = "Participant, Organiser")]
         public async Task<IActionResult> GetEvents()
         {
-            var events = await _context.RaceEvents.ToListAsync();
+            var eventsQuery = _context.RaceEvents.AsQueryable();
+
+            if (User.IsInRole("Organiser"))
+            {
+                var organiserIdClaim = User.FindFirstValue(
+                    ClaimTypes.NameIdentifier);
+                if (!int.TryParse(organiserIdClaim, out var organiserId))
+                {
+                    return Forbid();
+                }
+
+                eventsQuery = eventsQuery.Where(
+                    raceEvent => raceEvent.organiserID == organiserId);
+            }
+
+            var events = await eventsQuery.ToListAsync();
             return Ok(events);
         }
 

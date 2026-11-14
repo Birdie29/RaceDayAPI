@@ -55,8 +55,7 @@ namespace RaceDayAPI.Controllers
                 participant.participantName,
                 participant.participantSurname,
                 participant.email,
-                participant.phoneNumber,
-                participant.passwordHash
+                participant.phoneNumber
             });
         }
 
@@ -74,6 +73,28 @@ namespace RaceDayAPI.Controllers
             {
                 return Unauthorized(new { message = "Invalid email or password." });
             }
+
+            var claims = new List<Claim>
+            {
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    participant.participantID.ToString()),
+                new Claim(ClaimTypes.Name, participant.participantName),
+                new Claim(ClaimTypes.Role, "Participant")
+            };
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
 
             return Ok(new
             {

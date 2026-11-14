@@ -15,6 +15,8 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IPasswordHasher<Participant>,
 PasswordHasher<Participant>>();
@@ -51,8 +53,6 @@ builder.Services.AddDbContext<RaceDayContext>(options => options.UseSqlServer(
 
 var app = builder.Build();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
