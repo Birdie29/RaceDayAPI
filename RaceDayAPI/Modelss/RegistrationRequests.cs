@@ -32,6 +32,26 @@ namespace RaceDayAPI.Modelss
         public string password { get; set; } = string.Empty;
     }
 
+    public class UpdateOrganiserRequest
+    {
+        [Required]
+        public string organiserName { get; set; } = string.Empty;
+
+        [Required]
+        public string organiserSurname { get; set; } = string.Empty;
+
+        [Required]
+        [EmailAddress]
+        public string email { get; set; } = string.Empty;
+
+        [Required]
+        [Phone]
+        public string phoneNumber { get; set; } = string.Empty;
+
+        [MinLength(1)]
+        public string? password { get; set; }
+    }
+
     public class RegisterParticipantRequest
     {
         [Required]

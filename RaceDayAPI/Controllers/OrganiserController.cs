@@ -10,7 +10,6 @@ using RaceDayAPI.Modelss;
 
 namespace RaceDayAPI.Controllers
 {
-    [Authorize(Roles = "Organiser")]
     [ApiController]
     [Route("api/[controller]")]
     public class OrganiserController : ControllerBase
@@ -58,22 +57,32 @@ namespace RaceDayAPI.Controllers
             });
         }
 
-      [HttpPost("login")]
-      [AllowAnonymous]
+        [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginOrganiser(LoginRequest request)
         {
-           var organiser = await _context.Organisers
-                .FirstOrDefaultAsync(o => o.email == request.email);
+            var email = request.email.Trim();
+            var organiser = await _context.Organisers
+                .FirstOrDefaultAsync(organiser => organiser.email == email);
 
             if (organiser == null)
             {
                 return Unauthorized(new { message = "Invalid email or password." });
             }
 
-            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(organiser, organiser.passwordHash, request.password);
-            if (passwordVerificationResult != PasswordVerificationResult.Success)
+            var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(
+                organiser,
+                organiser.passwordHash,
+                request.password);
+            if (passwordVerificationResult == PasswordVerificationResult.Failed)
             {
                 return Unauthorized(new { message = "Invalid email or password." });
+            }
+
+            if (passwordVerificationResult == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                organiser.passwordHash = _passwordHasher.HashPassword(organiser, request.password);
+                await _context.SaveChangesAsync();
             }
 
             var claims = new List<Claim>
@@ -137,8 +146,23 @@ namespace RaceDayAPI.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> CreateOrganiser(Organiser organiser)
+        public async Task<IActionResult> CreateOrganiser(RegisterOrganiserRequest request)
         {
+            var email = request.email.Trim();
+            if (await _context.Organisers.AnyAsync(organiser => organiser.email == email))
+            {
+                return Conflict(new { message = "An organiser with this email already exists." });
+            }
+
+            var organiser = new Organiser
+            {
+                organiserName = request.organiserName,
+                organiserSurname = request.organiserSurname,
+                email = email,
+                phoneNumber = request.phoneNumber
+            };
+            organiser.passwordHash = _passwordHasher.HashPassword(organiser, request.password);
+
             _context.Organisers.Add(organiser);
             await _context.SaveChangesAsync();
 
@@ -154,7 +178,7 @@ namespace RaceDayAPI.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Organiser")]
-        public async Task<IActionResult> UpdateOrganiser(int id, Organiser updatedOrganiser)
+        public async Task<IActionResult> UpdateOrganiser(int id, UpdateOrganiserRequest updatedOrganiser)
         {
             var organiser = await _context.Organisers
                 .FirstOrDefaultAsync(organiser => organiser.organiserID == id);
@@ -164,11 +188,21 @@ namespace RaceDayAPI.Controllers
                 return NotFound();
             }
 
+            var email = updatedOrganiser.email.Trim();
+            if (await _context.Organisers.AnyAsync(existingOrganiser =>
+                    existingOrganiser.organiserID != id && existingOrganiser.email == email))
+            {
+                return Conflict(new { message = "An organiser with this email already exists." });
+            }
+
             organiser.organiserName = updatedOrganiser.organiserName;
             organiser.organiserSurname = updatedOrganiser.organiserSurname;
-            organiser.email = updatedOrganiser.email;
+            organiser.email = email;
             organiser.phoneNumber = updatedOrganiser.phoneNumber;
-            organiser.passwordHash = updatedOrganiser.passwordHash;
+            if (updatedOrganiser.password is not null)
+            {
+                organiser.passwordHash = _passwordHasher.HashPassword(organiser, updatedOrganiser.password);
+            }
 
             await _context.SaveChangesAsync();
 
